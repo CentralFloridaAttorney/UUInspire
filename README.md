@@ -28,7 +28,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
 
 - **Unity:** <a href="https://unity.com/" target="_blank">Unity Download</a>
-- **Blender:** <a href="https://www.blender.org/" target="_blank">Blender Download</a>
+- **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
 - **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
 For detailed installation instructions, refer to our <a href="https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing" target="_blank">Before You Start</a> guide.
