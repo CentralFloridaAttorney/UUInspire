@@ -32,8 +32,6 @@ Please ensure you have the necessary software installed on your computer. Follow
 - **Unity:** [Unity Download](https://unity.com/)
 - **Blender:** [Blender Download](https://www.blender.org/)
 - **GIMP:** [GIMP Download](https://www.gimp.org/)
-- **Visual Studio:** [Visual Studio Download](https://visualstudio.microsoft.com/)
-- **GitHub Desktop:** [GitHub Desktop Download](https://desktop.github.com/)
 
 For detailed installation instructions, refer to our [Before You Start](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing) guide.
 
@@ -44,7 +42,7 @@ For detailed installation instructions, refer to our [Before You Start](https://
 ### Session 1: Introduction to Game Development
 Dive into Unity and learn the basics of game creation. This session will guide you through setting up your development environment and starting your first project.
 
-[View Basic Repository](https://github.com/centralfloridaattorney/UUInspire-BasicSetup)
+[Download Assets](https://github.com/centralfloridaattorney/UUInspire)
 
 
 
