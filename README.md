@@ -18,9 +18,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 - [Getting Started](#getting-started)
 - [Projects](#projects)
   - [First Project 1: Introduction to Game Development](#session-1-introduction-to-game-development)
-
 - [Resources](#resources)
-- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -29,11 +27,11 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 
 Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
 
-- **Unity:** [Unity Download](https://unity.com/)
-- **Blender:** [Blender Download](https://www.blender.org/)
-- **GIMP:** [GIMP Download](https://www.gimp.org/)
+- **Unity:** <a href="https://unity.com/" target="_blank">Unity Download</a>
+- **Blender:** <a href="https://www.blender.org/" target="_blank">Blender Download</a>
+- **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
-For detailed installation instructions, refer to our [Before You Start](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing) guide.
+For detailed installation instructions, refer to our <a href="https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing" target="_blank">Before You Start</a> guide.
 
 ---
 
@@ -42,32 +40,15 @@ For detailed installation instructions, refer to our [Before You Start](https://
 ### Session 1: Introduction to Game Development
 Dive into Unity and learn the basics of game creation. This session will guide you through setting up your development environment and starting your first project.
 
-[Download Assets](https://github.com/centralfloridaattorney/UUInspire)
-
-
+<a href="https://github.com/centralfloridaattorney/UUInspire" target="_blank">Download Assets</a>
 
 ---
 
 ## Resources
 
-- **Unity Learn:** [Unity Learn](https://learn.unity.com/)
-- **Blender Tutorials:** [Blender Guru](https://www.blenderguru.com/)
-- **GIMP Tutorials:** [GIMP Documentation](https://www.gimp.org/tutorials/)
-- **GitHub Guides:** [GitHub Guides](https://guides.github.com/)
-
----
-
-## Contributing
-
-We welcome contributions from all members of the UU Inspire community. To contribute, follow these steps:
-
-1. Fork the repository you want to contribute to.
-2. Create a new branch for your feature or bugfix.
-3. Commit your changes with descriptive messages.
-4. Push your branch to your forked repository.
-5. Open a pull request to the main repository.
-
-Let's build something amazing together!
+- **Unity Learn:** <a href="https://learn.unity.com/" target="_blank">Unity Learn</a>
+- **Blender Tutorials:** <a href="https://www.blenderguru.com/" target="_blank">Blender Guru</a>
+- **GIMP Tutorials:** <a href="https://www.gimp.org/tutorials/" target="_blank">GIMP Documentation</a>
 
 ---
 
