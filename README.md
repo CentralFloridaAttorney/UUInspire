@@ -1,9 +1,8 @@
 # UUInspire
-The UU Inspire learning group
 
-### UU Inspire
+Welcome to the UU Inspire Learning Group! 
 
-Welcome to the UU Inspire Learning Group! This is the central repository for all the projects created by our dynamic and creative community. We are thrilled to embark on this journey of game development, art, and innovation together. Here you will find links to various session projects, resources, and contributions from our talented members.
+This is the central repository for all the projects created by our dynamic and creative community. We are thrilled to embarkJoin us on this journey of game development, art, and innovation together. Here you will find assets and links to various session projects, resources, and contributions from our talented members.
 
 ---
 
@@ -25,13 +24,13 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 
 ## Getting Started
 
-Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
+We use open source software and Unity to create new worlds and the items within them.  Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
 
 - **Unity:** <a href="https://unity.com/" target="_blank">Unity Download</a>
 - **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
 - **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
-For detailed installation instructions, refer to our <a href="https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing" target="_blank">Before You Start</a> guide.
+For more information about UU Inspiration see the following google document: <a href="https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing" target="_blank">Before You Start</a>.
 
 ---
 
