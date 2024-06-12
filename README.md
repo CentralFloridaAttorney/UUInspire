@@ -1,6 +1,6 @@
 # UUInspire
 
-![UU Inspire Learning Group](https://yourimageurl.com/uuinspire_learning_group_class.png)
+![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png)
 
 Welcome to the UU Inspire Learning Group!
 
@@ -18,7 +18,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 
 - [Getting Started](#getting-started)
 - [Projects](#projects)
-  - [First Project 1: Introduction to Game Development](#session-1-introduction-to-game-development)
+  - [Session 1: Flaming Chalice](#session-1-flaming-chalice)
 - [Resources](#resources)
 - [License](#license)
 
@@ -32,16 +32,16 @@ We use open source software and Unity to create new worlds and the items within 
 - **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
 - **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
-For more information about UU Inspiration see the following google document: <a href="https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing" target="_blank">Before You Start</a>.
+For detailed installation instructions, refer to our [Software Installation Guide](PREREQUISITES.md).
 
 ---
 
 ## Projects
 
-### Session 1: Introduction to Game Development
-Dive into Unity and learn the basics of game creation. This session will guide you through setting up your development environment and starting your first project.
+### Session 1: Flaming Chalice
+Dive into Unity and learn the basics of GameObjects in Unity by creating a Flaming Chalice in Unity.
 
-<a href="https://github.com/centralfloridaattorney/UUInspire" target="_blank">Download Assets</a>
+For detailed instructions, refer to [FLAMING_CHALICE.md](https://github.com/centralfloridaattorney/UUInspire/docs/FLAMING_CHALICE.md).
 
 ---
 
