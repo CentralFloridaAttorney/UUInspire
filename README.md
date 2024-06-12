@@ -1,8 +1,10 @@
 # UUInspire
 
-Welcome to the UU Inspire Learning Group! 
+![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png)
 
-This is the central repository for all the projects created by our dynamic and creative community. We are thrilled to embarkJoin us on this journey of game development, art, and innovation together. Here you will find assets and links to various session projects, resources, and contributions from our talented members.
+Welcome to the UU Inspire Learning Group!
+
+This is the central repository for all the projects created by our dynamic and creative community. We are thrilled to embark on this journey of game development, art, and innovation together. Here you will find assets and links to various session projects, resources, and contributions from our talented members.
 
 ---
 
@@ -24,7 +26,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 
 ## Getting Started
 
-We use open source software and Unity to create new worlds and the items within them.  Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
+We use open source software and Unity to create new worlds and the items within them. Please ensure you have the necessary software installed on your computer. Follow the links below to download and install the required tools:
 
 - **Unity:** <a href="https://unity.com/" target="_blank">Unity Download</a>
 - **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
