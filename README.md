@@ -1,6 +1,6 @@
 # UUInspire
 
-![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png)
+![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png).
 
 Welcome to the UU Inspire Learning Group!
 
@@ -41,7 +41,7 @@ For detailed installation instructions, refer to our [Software Installation Guid
 ### Session 1: Flaming Chalice
 Dive into Unity and learn the basics of GameObjects in Unity by creating a Flaming Chalice in Unity.
 
-For detailed instructions, refer to [FLAMING_CHALICE.md](https://github.com/centralfloridaattorney/UUInspire/docs/FLAMING_CHALICE.md).
+For detailed instructions, refer to [FLAMING_CHALICE.md](docs%2FFLAMING_CHALICE.md)
 
 ---
 
