@@ -1,6 +1,6 @@
 # UUInspire
 
-![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png)
+![UU Inspire Learning Group](https://yourimageurl.com/uuinspire_learning_group_class.png)
 
 Welcome to the UU Inspire Learning Group!
 
