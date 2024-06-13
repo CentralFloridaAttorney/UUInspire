@@ -10,7 +10,10 @@ This is the central repository for all the projects created by our dynamic and c
 
 ## UUInspire Group Information
 
-[UUInspire Group Information](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing)
+[UUInspire Group Information](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po)
+
+[UUInspire Resistration Form](https://docs.google.com/document/d/1JqcD5vDgcqFa5hqe5bkLUX3mk1JsnGNG)
+
 
 ---
 ## Mission Statement
@@ -25,7 +28,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 - [Projects](#projects)
   - [Session 1: Flaming Chalice](#session-1-flaming-chalice)
 - [Resources](#resources)
-- [License](#license)
+- [LICENSE](LICENSE)
 
 ---
 

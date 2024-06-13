@@ -66,7 +66,7 @@ In this session, you will create a simple game in Unity. The project will includ
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](..%2FLICENSE) file for details.
 
 ---
 
