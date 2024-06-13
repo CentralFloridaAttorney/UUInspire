@@ -32,8 +32,6 @@ We use open source software and Unity to create new worlds and the items within 
 - **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
 - **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
-For detailed installation instructions, refer to our [Software Installation Guide](PREREQUISITES.md).
-
 ---
 
 ## Projects
