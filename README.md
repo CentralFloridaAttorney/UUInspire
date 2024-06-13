@@ -1,6 +1,6 @@
 # UUInspire
 
-![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png).
+![uuinspire_learning_group_class.png](images%2Fuuinspire_learning_group_class.png)
 
 Welcome to the UU Inspire Learning Group!
 
@@ -8,6 +8,11 @@ This is the central repository for all the projects created by our dynamic and c
 
 ---
 
+## UUInspire Group Information
+
+[UUInspire Group Information](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing)
+
+---
 ## Mission Statement
 
 At UU Inspire, our mission is to ignite creativity and foster a love for learning within the Unitarian Universalist community. We aim to provide a supportive environment where young minds and their families can explore game development, art, and design through collaborative and engaging projects.
