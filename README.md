@@ -47,7 +47,7 @@ We use open source software and Unity to create new worlds and the items within 
 ### Session 1: Flaming Chalice
 Dive into Unity and learn the basics of GameObjects in Unity by creating a Flaming Chalice in Unity.
 
-For detailed instructions, refer to [FLAMING_CHALICE.md](docs%2FFLAMING_CHALICE.md)
+For an outline of the instructions, refer to [FLAMING_CHALICE.md](docs%2FFLAMING_CHALICE.md)
 
 ---
 
