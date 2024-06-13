@@ -4,6 +4,11 @@ Welcome to UU Inspire! Before you start with any of our projects, please ensure 
 
 ---
 
+[UUInspire Group Information](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing)
+
+---
+
+
 ## Table of Contents
 
 - [Unity Installation](#unity-installation)
@@ -62,10 +67,6 @@ Blender is a versatile tool for 3D modeling, animation, and rendering. Follow th
 
 3. **Install Blender:**
    - Run the installer and follow the on-screen instructions to install Blender.
-
----
-
-For detailed installation instructions, refer to our [Before You Start](https://docs.google.com/document/d/1pRzRfC04XlTTN2ffdh4b3zUN7lxsSF6ggS-FJYHf_po/edit?usp=sharing) guide.
 
 ---
 
