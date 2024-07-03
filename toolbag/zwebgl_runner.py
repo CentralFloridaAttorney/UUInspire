@@ -17,6 +17,13 @@ class ZWebGLRunner:
         self.select_button = tk.Button(root, text="Select File", command=self.select_file)
         self.select_button.pack(pady=5)
 
+        self.port_label = tk.Label(root, text="Enter Port Number:")
+        self.port_label.pack(pady=5)
+
+        self.port_entry = tk.Entry(root)
+        self.port_entry.pack(pady=5)
+        self.port_entry.insert(0, "40000")
+
         self.run_button = tk.Button(root, text="Run Flask Server", command=self.run_server, state=tk.DISABLED)
         self.run_button.pack(pady=5)
 
@@ -44,12 +51,11 @@ class ZWebGLRunner:
             directory = os.path.dirname(self.file_path)
             return send_from_directory(directory, filename)
 
-        app.run(host="0.0.0.0", port=50000)
+        port = int(self.port_entry.get())
+        app.run(host="0.0.0.0", port=port)
 
 
 if __name__ == '__main__':
     root = tk.Tk()
     app = ZWebGLRunner(root)
     root.mainloop()
-
-
