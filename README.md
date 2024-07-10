@@ -25,7 +25,7 @@ At UU Inspire, our mission is to ignite creativity and foster a love for learnin
 - [Getting Started](#getting-started)
 - [Projects](#projects)
   - [The Flaming Chalice](https://learn.unity.com/course/ml-agents-hummingbirds?uv=2019.3)
-  - [The Flaming Chalice](#session-1-flaming-chalice)
+  - [ML-Agents: Hummingbirds](#session-1-flaming-chalice)
   - [Unity Multiplayer Setup](https://gitlab.com/GameDevTV/unity-multiplayer/unity-multiplayer)
 - [Resources](#resources)
 - [LICENSE](LICENSE)
