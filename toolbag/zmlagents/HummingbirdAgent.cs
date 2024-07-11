@@ -3,9 +3,8 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-/// Updated script for Unity Learning Trail ML-Agents: Hummingbirds
+/// Updated by JOhn M. Iriye for use with Unity Learning Trail ML-Agents: Hummingbirds
 /// Use Unity ml-agents Release 2.0.1 - November 8, 2021
-/// In Python project use pip install mlagents to train with trainer_config.yaml
 /// <summary>
 /// A hummingbird Machine Learning Agent
 /// </summary>
