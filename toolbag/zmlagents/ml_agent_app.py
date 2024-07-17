@@ -1,18 +1,17 @@
 import json
-from tkinter import filedialog, simpledialog
-import tkinter as tk
-from tkinter import ttk
-import traceback
 import os
 import subprocess
 import threading
+import traceback
 import webbrowser
-from datetime import datetime
 import yaml
+from datetime import datetime
+from tkinter import filedialog, simpledialog, ttk
+
+import tkinter as tk
 
 
 def get_default_params():
-    # Replace with actual default parameters fetching logic
     return {
         "Behavior Name": "CoinCollectorAgent",
         "Trainer Type": "ppo",
@@ -45,6 +44,288 @@ def get_default_params():
 def save_yaml_file(config, output_file):
     with open(output_file, 'w') as file:
         yaml.safe_dump(config, file)
+
+
+class ZTrainer:
+    def __init__(self, config_path, run_name, conda_env_name, mlagents_learn_path="mlagents-learn",
+                 executable_path=None, no_graphics=False, time_scale=False):
+        self.config_path = config_path
+        self.run_name = run_name
+        self.conda_env_name = conda_env_name
+        self.mlagents_learn_path = mlagents_learn_path
+        self.executable_path = executable_path
+        self.no_graphics = no_graphics
+        self.time_scale = time_scale
+        self.process = None
+        self.threads = []
+
+    def start_training(self, callback):
+        thread = threading.Thread(target=self._start_training_process, args=(callback,))
+        thread.start()
+        self.threads.append(thread)
+
+    def _start_training_process(self, callback):
+        try:
+            if not os.access(self.config_path, os.R_OK):
+                raise PermissionError(f"Read permission denied for config file: {self.config_path}")
+
+            cmd = f"conda run -n {self.conda_env_name} {self.mlagents_learn_path} {self.config_path} --run-id={self.run_name} --base-port=5005 --results-dir=results --force"
+
+            if self.executable_path:
+                cmd = f"{cmd} --env {self.executable_path}"
+            if self.no_graphics:
+                cmd = f"{cmd} --no-graphics"
+            if self.time_scale:
+                cmd = f"{cmd} --time-scale"
+
+            if os.name == 'nt':
+                self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+            else:
+                self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, preexec_fn=os.setsid)
+
+            self._read_process_output(callback)
+        except PermissionError as pe:
+            callback(f"Permission Error: {pe}")
+        except Exception as e:
+            callback(f"Failed to start training: {e}\n{traceback.format_exc()}")
+
+    def _read_process_output(self, callback):
+        try:
+            for line in self.process.stdout:
+                callback(line)
+            for line in self.process.stderr:
+                callback(line)
+        except Exception as e:
+            callback(f"Error reading process output: {e}\n{traceback.format_exc()}")
+
+    def stop(self):
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+        for thread in self.threads:
+            thread.join()
+
+
+class ZTensorBoardManager:
+    def __init__(self, conda_env_name):
+        self.conda_env_name = conda_env_name
+        self.process = None
+        self.threads = []
+
+    def start_tensorboard(self, callback):
+        thread = threading.Thread(target=self._start_tensorboard_process, args=(callback,))
+        thread.start()
+        self.threads.append(thread)
+
+    def _start_tensorboard_process(self, callback):
+        try:
+            cmd = f"conda run -n {self.conda_env_name} tensorboard --logdir=results --port=6006"
+            self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
+            self._read_process_output(callback)
+            webbrowser.open("http://localhost:6006")
+        except Exception as e:
+            callback(f"Failed to start TensorBoard: {e}")
+
+    def _read_process_output(self, callback):
+        try:
+            for line in self.process.stdout:
+                callback(line)
+            for line in self.process.stderr:
+                callback(line)
+        except Exception as e:
+            callback(f"Error reading process output: {e}")
+
+    def stop(self):
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+        for thread in self.threads:
+            thread.join()
+
+
+class ConfigGenerator:
+    def __init__(self, params=None, yaml_file=None, num_behaviors=1):
+        self.yaml_file = yaml_file
+        self.params = params or get_default_params()
+        self.num_behaviors = num_behaviors
+        if yaml_file:
+            self.config = self.load_yaml_file()
+        else:
+            self.config = self.create_config_structure()
+            self.save_yaml_file("training_config.yaml")
+
+    def create_config_structure(self):
+        config = {'behaviors': {}}
+        for i in range(self.num_behaviors):
+            behavior_name = f"{self.params['Behavior Name']}_{i + 1}"
+            config['behaviors'][behavior_name] = self.get_behavior_structure(behavior_name)
+        return config
+
+    def get_behavior_structure(self, behavior_name):
+        return {
+            'trainer_type': self.params["Trainer Type"],
+            'hyperparameters': {
+                'batch_size': int(self.params["Batch Size"]),
+                'buffer_size': int(self.params["Buffer Size"]),
+                'learning_rate': float(self.params["Learning Rate"]),
+                'beta': float(self.params["Beta"]),
+                'epsilon': float(self.params["Epsilon"]),
+                'lambd': float(self.params["Lambd"]),
+                'num_epoch': int(self.params["Num Epoch"]),
+                'learning_rate_schedule': self.params["Learning Rate Schedule"],
+            },
+            'network_settings': {
+                'normalize': self.params["Normalize"].lower() == 'true',
+                'hidden_units': int(self.params["Hidden Units"]),
+                'num_layers': int(self.params["Num Layers"]),
+                'vis_encode_type': self.params["Visual Encoder Type"],
+            },
+            'reward_signals': {
+                'extrinsic': {
+                    'gamma': float(self.params["Extrinsic Gamma"]),
+                    'strength': float(self.params["Extrinsic Strength"]),
+                },
+                'curiosity': {
+                    'strength': float(self.params["Curiosity Strength"]),
+                    'gamma': float(self.params["Curiosity Gamma"]),
+                    'network_settings': {
+                        'encoding_size': int(self.params["Curiosity Encoding Size"]),
+                    },
+                }
+            },
+            'max_steps': int(self.params["Max Steps"]),
+            'time_horizon': int(self.params["Time Horizon"]),
+            'summary_freq': int(self.params["Summary Frequency"]),
+            'checkpoint_interval': int(self.params["Checkpoint Interval"]),
+            'keep_checkpoints': int(self.params["Keep Checkpoints"]),
+            'threaded': self.params["Threaded"].lower() == 'true',
+        }
+
+    def load_yaml_file(self):
+        if not self.yaml_file:
+            raise ValueError("YAML file path not provided.")
+        with open(self.yaml_file, 'r') as file:
+            self.config = yaml.safe_load(file)
+        return self.config
+
+    def save_yaml_file(self, output_file=None):
+        if not output_file:
+            main_key = next(iter(self.config))
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_file = f"{main_key}_{timestamp}.yaml"
+        save_yaml_file(self.config, output_file)
+
+    def set_value(self, pathlikekey, value):
+        keys = pathlikekey.split('.')
+        current = self.config
+        for key in keys[:-1]:
+            if key not in current:
+                current[key] = {}
+            current = current[key]
+        current[keys[-1]] = value
+
+    def rename_behavior(self, old_name, new_name):
+        if old_name in self.config['behaviors']:
+            self.config['behaviors'][new_name] = self.config['behaviors'][old_name].copy()
+            del self.config['behaviors'][old_name]
+
+
+class GUISetup:
+    def __init__(self, root, choose_file_callback, apply_settings_callback, start_training_callback,
+                 start_tensorboard_callback, choose_conda_env_callback, choose_executable_callback):
+        self.root = root
+        self.root.title("ML-Agents Trainer")
+
+        # Add buttons and entries for the callbacks
+        self.choose_file_button = ttk.Button(root, text="Choose Config File", command=choose_file_callback)
+        self.choose_file_button.grid(row=0, column=0, padx=10, pady=10)
+
+        self.conda_env_label = ttk.Label(root, text="Conda Environment:")
+        self.conda_env_label.grid(row=1, column=0, padx=10, pady=10)
+        self.conda_env_entry = ttk.Entry(root)
+        self.conda_env_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.conda_env_button = ttk.Button(root, text="Select Conda Env", command=choose_conda_env_callback)
+        self.conda_env_button.grid(row=1, column=2, padx=10, pady=10)
+
+        self.executable_label = ttk.Label(root, text="Unity Executable:")
+        self.executable_label.grid(row=2, column=0, padx=10, pady=10)
+        self.executable_entry = ttk.Entry(root)
+        self.executable_entry.grid(row=2, column=1, padx=10, pady=10)
+        self.executable_button = ttk.Button(root, text="Select Executable", command=choose_executable_callback)
+        self.executable_button.grid(row=2, column=2, padx=10, pady=10)
+
+        # Other buttons and entries
+        self.run_name_label = ttk.Label(root, text="Run Name:")
+        self.run_name_label.grid(row=3, column=0, padx=10, pady=10)
+        self.run_name_entry = ttk.Entry(root)
+        self.run_name_entry.grid(row=3, column=1, padx=10, pady=10)
+
+        self.apply_settings_button = ttk.Button(root, text="Apply Settings", command=apply_settings_callback)
+        self.apply_settings_button.grid(row=4, column=0, padx=10, pady=10)
+
+        self.start_training_button = ttk.Button(root, text="Start Training", command=start_training_callback)
+        self.start_training_button.grid(row=5, column=0, padx=10, pady=10)
+
+        self.start_tensorboard_button = ttk.Button(root, text="Start TensorBoard", command=start_tensorboard_callback)
+        self.start_tensorboard_button.grid(row=5, column=1, padx=10, pady=10)
+
+        # Console output
+        self.console_output = tk.Text(root, height=15, width=80)
+        self.console_output.grid(row=6, column=0, columnspan=3, padx=10, pady=10)
+
+        self.status_label = ttk.Label(root, text="Status: Ready")
+        self.status_label.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
+
+        self.num_behaviors_label = ttk.Label(root, text="Number of Behaviors:")
+        self.num_behaviors_label.grid(row=8, column=0, padx=10, pady=10)
+        self.num_behaviors_entry = ttk.Entry(root)
+        self.num_behaviors_entry.grid(row=8, column=1, padx=10, pady=10)
+        self.num_behaviors_entry.insert(0, '1')  # Set a default value
+
+        self.no_graphics_var = tk.BooleanVar()
+        self.no_graphics_checkbox = ttk.Checkbutton(root, text="No Graphics", variable=self.no_graphics_var)
+        self.no_graphics_checkbox.grid(row=9, column=0, padx=10, pady=5, sticky=tk.W)
+
+        self.time_scale_var = tk.BooleanVar()
+        self.time_scale_checkbox = ttk.Checkbutton(root, text="Time Scale", variable=self.time_scale_var)
+        self.time_scale_checkbox.grid(row=9, column=1, padx=10, pady=5, sticky=tk.W)
+
+        self.second_frame = ttk.Frame(root)
+        self.second_frame.grid(row=10, column=0, columnspan=3, padx=10, pady=10)
+        self.scrollbar = ttk.Scrollbar(self.second_frame, orient=tk.VERTICAL)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.canvas = tk.Canvas(self.second_frame, yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.canvas.yview)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.scrollable_frame = ttk.Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
+        self.entries = {}
+        self.entry_rows = {}
+
+        self.add_tensorboard_link()
+
+    def update_scroll_region(self):
+        if self.canvas.winfo_exists():
+            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def update_console_output(self, text):
+        self.console_output.insert(tk.END, text + '\n')
+        self.console_output.see(tk.END)
+
+    def update_run_name(self, config_path):
+        run_name = os.path.splitext(os.path.basename(config_path))[0]
+        self.run_name_entry.delete(0, tk.END)
+        self.run_name_entry.insert(0, run_name)
+
+    def add_tensorboard_link(self):
+        hyperlink_text = "TensorBoard: http://localhost:6006"
+        self.console_output.insert(tk.END, hyperlink_text)
+        self.console_output.tag_add("hyperlink", "1.12", "1.37")
+        self.console_output.tag_config("hyperlink", foreground="blue", underline=True)
+        self.console_output.tag_bind("hyperlink", "<Button-1>", lambda e: webbrowser.open("http://localhost:6006"))
+        self.console_output.insert(tk.END, "\n")
+        self.console_output.see(tk.END)
 
 
 class MLAgentApp:
@@ -246,7 +527,9 @@ class MLAgentApp:
         settings = {
             'conda_env_name': self.conda_env_name,
             'executable_path': self.executable_path,
-            'run_name': self.gui.run_name_entry.get()
+            'run_name': self.gui.run_name_entry.get(),
+            'no_graphics': self.gui.no_graphics_var.get(),
+            'time_scale': self.gui.time_scale_var.get()
         }
         with open(self.SETTINGS_FILE, 'w') as f:
             json.dump(settings, f)
@@ -264,6 +547,8 @@ class MLAgentApp:
                 self.gui.executable_entry.insert(0, self.executable_path)
                 self.gui.run_name_entry.delete(0, tk.END)
                 self.gui.run_name_entry.insert(0, run_name)
+                self.gui.no_graphics_var.set(settings.get('no_graphics', False))
+                self.gui.time_scale_var.set(settings.get('time_scale', False))
 
     def convert_value(self, value):
         try:
@@ -298,7 +583,10 @@ class MLAgentApp:
             self.gui.update_console_output("Error: Unity executable is not selected.")
             return
 
-        self.trainer = ZTrainer(self.config_path, run_name, conda_env_name, self.mlagents_learn_path, executable_path)
+        no_graphics = self.gui.no_graphics_var.get()
+        time_scale = self.gui.time_scale_var.get()
+
+        self.trainer = ZTrainer(self.config_path, run_name, conda_env_name, self.mlagents_learn_path, executable_path, no_graphics, time_scale)
         self.trainer.start_training(self.gui.update_console_output)
 
     def start_tensorboard_thread(self):
@@ -313,266 +601,6 @@ class MLAgentApp:
         if self.tensorboard_manager:
             self.tensorboard_manager.stop()
         self.root.destroy()
-
-
-class ZTrainer:
-    def __init__(self, config_path, run_name, conda_env_name, mlagents_learn_path="mlagents-learn",
-                 executable_path=None):
-        self.config_path = config_path
-        self.run_name = run_name
-        self.conda_env_name = conda_env_name
-        self.mlagents_learn_path = mlagents_learn_path
-        self.executable_path = executable_path
-        self.process = None
-        self.threads = []
-
-    def start_training(self, callback):
-        thread = threading.Thread(target=self._start_training_process, args=(callback,))
-        thread.start()
-        self.threads.append(thread)
-
-    def _start_training_process(self, callback):
-        try:
-            if not os.access(self.config_path, os.R_OK):
-                raise PermissionError(f"Read permission denied for config file: {self.config_path}")
-
-            # Activate the Conda environment and run mlagents-learn with the Unity executable
-            cmd = f"conda run -n {self.conda_env_name} {self.mlagents_learn_path} {self.config_path} --run-id={self.run_name} --base-port=5005 --results-dir=results --force"
-
-            if self.executable_path:
-                cmd = f"{cmd} --env {self.executable_path}"
-
-            self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-            self._read_process_output(callback)
-        except PermissionError as pe:
-            callback(f"Permission Error: {pe}")
-        except Exception as e:
-            callback(f"Failed to start training: {e}\n{traceback.format_exc()}")
-
-    def _read_process_output(self, callback):
-        try:
-            for line in self.process.stdout:
-                callback(line)
-            for line in self.process.stderr:
-                callback(line)
-        except Exception as e:
-            callback(f"Error reading process output: {e}\n{traceback.format_exc()}")
-
-    def stop(self):
-        if self.process and self.process.poll() is None:
-            self.process.terminate()
-        for thread in self.threads:
-            thread.join()
-
-
-class ZTensorBoardManager:
-    def __init__(self, conda_env_name):
-        self.conda_env_name = conda_env_name
-        self.process = None
-        self.threads = []
-
-    def start_tensorboard(self, callback):
-        thread = threading.Thread(target=self._start_tensorboard_process, args=(callback,))
-        thread.start()
-        self.threads.append(thread)
-
-    def _start_tensorboard_process(self, callback):
-        try:
-            # Activate the Conda environment and run TensorBoard
-            cmd = f"conda run -n {self.conda_env_name} tensorboard --logdir=results --port=6006"
-
-            self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, text=True)
-            self._read_process_output(callback)
-            webbrowser.open("http://localhost:6006")
-        except Exception as e:
-            callback(f"Failed to start TensorBoard: {e}")
-
-    def _read_process_output(self, callback):
-        try:
-            for line in self.process.stdout:
-                callback(line)
-            for line in self.process.stderr:
-                callback(line)
-        except Exception as e:
-            callback(f"Error reading process output: {e}")
-
-    def stop(self):
-        if self.process and self.process.poll() is None:
-            self.process.terminate()
-        for thread in self.threads:
-            thread.join()
-
-
-class ConfigGenerator:
-    def __init__(self, params=None, yaml_file=None, num_behaviors=1):
-        self.yaml_file = yaml_file
-        self.params = params or get_default_params()
-        self.num_behaviors = num_behaviors
-        if yaml_file:
-            self.config = self.load_yaml_file()
-        else:
-            self.config = self.create_config_structure()
-            self.save_yaml_file("training_config.yaml")
-
-    def create_config_structure(self):
-        config = {'behaviors': {}}
-        for i in range(self.num_behaviors):
-            behavior_name = f"{self.params['Behavior Name']}_{i + 1}"
-            config['behaviors'][behavior_name] = self.get_behavior_structure(behavior_name)
-        return config
-
-    def get_behavior_structure(self, behavior_name):
-        return {
-            'trainer_type': self.params["Trainer Type"],
-            'hyperparameters': {
-                'batch_size': int(self.params["Batch Size"]),
-                'buffer_size': int(self.params["Buffer Size"]),
-                'learning_rate': float(self.params["Learning Rate"]),
-                'beta': float(self.params["Beta"]),
-                'epsilon': float(self.params["Epsilon"]),
-                'lambd': float(self.params["Lambd"]),
-                'num_epoch': int(self.params["Num Epoch"]),
-                'learning_rate_schedule': self.params["Learning Rate Schedule"],
-            },
-            'network_settings': {
-                'normalize': self.params["Normalize"].lower() == 'true',
-                'hidden_units': int(self.params["Hidden Units"]),
-                'num_layers': int(self.params["Num Layers"]),
-                'vis_encode_type': self.params["Visual Encoder Type"],
-            },
-            'reward_signals': {
-                'extrinsic': {
-                    'gamma': float(self.params["Extrinsic Gamma"]),
-                    'strength': float(self.params["Extrinsic Strength"]),
-                },
-                'curiosity': {
-                    'strength': float(self.params["Curiosity Strength"]),
-                    'gamma': float(self.params["Curiosity Gamma"]),
-                    'network_settings': {
-                        'encoding_size': int(self.params["Curiosity Encoding Size"]),
-                    },
-                }
-            },
-            'max_steps': int(self.params["Max Steps"]),
-            'time_horizon': int(self.params["Time Horizon"]),
-            'summary_freq': int(self.params["Summary Frequency"]),
-            'checkpoint_interval': int(self.params["Checkpoint Interval"]),
-            'keep_checkpoints': int(self.params["Keep Checkpoints"]),
-            'threaded': self.params["Threaded"].lower() == 'true',
-        }
-
-    def load_yaml_file(self):
-        if not self.yaml_file:
-            raise ValueError("YAML file path not provided.")
-        with open(self.yaml_file, 'r') as file:
-            self.config = yaml.safe_load(file)
-        return self.config
-
-    def save_yaml_file(self, output_file=None):
-        if not output_file:
-            main_key = next(iter(self.config))
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_file = f"{main_key}_{timestamp}.yaml"
-        save_yaml_file(self.config, output_file)
-
-    def set_value(self, pathlikekey, value):
-        keys = pathlikekey.split('.')
-        current = self.config
-        for key in keys[:-1]:
-            if key not in current:
-                current[key] = {}
-            current = current[key]
-        current[keys[-1]] = value
-
-    def rename_behavior(self, old_name, new_name):
-        if old_name in self.config['behaviors']:
-            self.config['behaviors'][new_name] = self.config['behaviors'][old_name].copy()
-            del self.config['behaviors'][old_name]
-
-
-class GUISetup:
-    def __init__(self, root, choose_file_callback, apply_settings_callback, start_training_callback,
-                 start_tensorboard_callback, choose_conda_env_callback, choose_executable_callback):
-        self.root = root
-        self.root.title("ML-Agents Trainer")
-
-        # Add buttons and entries for the callbacks
-        self.choose_file_button = ttk.Button(root, text="Choose Config File", command=choose_file_callback)
-        self.choose_file_button.grid(row=0, column=0, padx=10, pady=10)
-
-        self.conda_env_label = ttk.Label(root, text="Conda Environment:")
-        self.conda_env_label.grid(row=1, column=0, padx=10, pady=10)
-        self.conda_env_entry = ttk.Entry(root)
-        self.conda_env_entry.grid(row=1, column=1, padx=10, pady=10)
-        self.conda_env_button = ttk.Button(root, text="Select Conda Env", command=choose_conda_env_callback)
-        self.conda_env_button.grid(row=1, column=2, padx=10, pady=10)
-
-        self.executable_label = ttk.Label(root, text="Unity Executable:")
-        self.executable_label.grid(row=2, column=0, padx=10, pady=10)
-        self.executable_entry = ttk.Entry(root)
-        self.executable_entry.grid(row=2, column=1, padx=10, pady=10)
-        self.executable_button = ttk.Button(root, text="Select Executable", command=choose_executable_callback)
-        self.executable_button.grid(row=2, column=2, padx=10, pady=10)
-
-        # Other buttons and entries
-        self.run_name_label = ttk.Label(root, text="Run Name:")
-        self.run_name_label.grid(row=3, column=0, padx=10, pady=10)
-        self.run_name_entry = ttk.Entry(root)
-        self.run_name_entry.grid(row=3, column=1, padx=10, pady=10)
-
-        self.apply_settings_button = ttk.Button(root, text="Apply Settings", command=apply_settings_callback)
-        self.apply_settings_button.grid(row=4, column=0, padx=10, pady=10)
-
-        self.start_training_button = ttk.Button(root, text="Start Training", command=start_training_callback)
-        self.start_training_button.grid(row=5, column=0, padx=10, pady=10)
-
-        self.start_tensorboard_button = ttk.Button(root, text="Start TensorBoard", command=start_tensorboard_callback)
-        self.start_tensorboard_button.grid(row=5, column=1, padx=10, pady=10)
-
-        # Console output
-        self.console_output = tk.Text(root, height=15, width=80)
-        self.console_output.grid(row=6, column=0, columnspan=3, padx=10, pady=10)
-
-        self.status_label = ttk.Label(root, text="Status: Ready")
-        self.status_label.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
-
-        self.num_behaviors_label = ttk.Label(root, text="Number of Behaviors:")
-        self.num_behaviors_label.grid(row=8, column=0, padx=10, pady=10)
-        self.num_behaviors_entry = ttk.Entry(root)
-        self.num_behaviors_entry.grid(row=8, column=1, padx=10, pady=10)
-        self.num_behaviors_entry.insert(0, '1')  # Set a default value
-
-        self.second_frame = ttk.Frame(root)
-        self.second_frame.grid(row=9, column=0, columnspan=3, padx=10, pady=10)
-        self.scrollbar = ttk.Scrollbar(self.second_frame, orient=tk.VERTICAL)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.canvas = tk.Canvas(self.second_frame, yscrollcommand=self.scrollbar.set)
-        self.scrollbar.config(command=self.canvas.yview)
-        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        self.scrollable_frame = ttk.Frame(self.canvas)
-        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-        self.scrollable_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-
-        self.entries = {}
-        self.entry_rows = {}
-
-    def update_scroll_region(self):
-        if self.canvas.winfo_exists():
-            self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
-    def update_console_output(self, text):
-        self.console_output.insert(tk.END, text + '\n')
-        self.console_output.see(tk.END)
-
-    def update_run_name(self, config_path):
-        run_name = os.path.splitext(os.path.basename(config_path))[0]
-        self.run_name_entry.delete(0, tk.END)
-        self.run_name_entry.insert(0, run_name)
-
-    def add_tensorboard_link(self):
-        self.console_output.insert(tk.END, "TensorBoard: http://localhost:6006\n")
-        self.console_output.see(tk.END)
 
 
 if __name__ == "__main__":
