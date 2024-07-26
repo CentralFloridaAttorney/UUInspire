@@ -40,29 +40,7 @@ We use open source software and Unity to create new worlds and the items within 
 - **Blender:** <a href="https://www.blender.org/download/" target="_blank">Blender Download</a>
 - **GIMP:** <a href="https://www.gimp.org/" target="_blank">GIMP Download</a>
 
----
+For Python-related projects, ensure you have the necessary Python libraries installed. You can install them using the following `pip` command:
 
-## Projects
-
-### Session 1: Flaming Chalice
-
-Dive into Unity and learn the basics of GameObjects in Unity by creating a Flaming Chalice in Unity.
-For an outline of the instructions, refer to [FLAMING_CHALICE.md](docs%2FFLAMING_CHALICE.md)
-
----
-
-## Resources
-
-- **Unity Learn:** <a href="https://learn.unity.com/" target="_blank">Unity Learn</a>
-- **Blender Tutorials:** <a href="https://www.blenderguru.com/" target="_blank">Blender Guru</a>
-- **GIMP Tutorials:** <a href="https://www.gimp.org/tutorials/" target="_blank">GIMP Documentation</a>
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-Thank you for being a part of UU Inspire. Let's spark creativity and innovation together!
+```sh
+pip install langchain-core langchain-community langchain-openai langchain python-dotenv beautifulsoup4 chromadb requests
